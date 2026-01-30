@@ -1,0 +1,97 @@
+import { useState } from 'react';
+import { TaskListScreen } from '@/app/components/TaskListScreen';
+import { TaskDetailsScreen } from '@/app/components/TaskDetailsScreen';
+import { AddTaskScreen } from '@/app/components/AddTaskScreen';
+
+export type Task = {
+  id: number;
+  title: string;
+  description: string;
+  priority: 'High' | 'Medium' | 'Low';
+  dueDate: string;
+  status: 'Pending' | 'In Progress' | 'Completed';
+};
+
+export default function App() {
+  const [currentScreen, setCurrentScreen] = useState<'list' | 'details' | 'add'>('list');
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  const mockTasks: Task[] = [
+    {
+      id: 1,
+      title: 'Complete Project Proposal',
+      description: 'Write and submit the final project proposal for the client meeting. Include budget estimates and timeline.',
+      priority: 'High',
+      dueDate: 'Feb 5, 2026',
+      status: 'In Progress'
+    },
+    {
+      id: 2,
+      title: 'Review Code Changes',
+      description: 'Review pull requests from the development team and provide feedback on code quality.',
+      priority: 'Medium',
+      dueDate: 'Feb 3, 2026',
+      status: 'Pending'
+    },
+    {
+      id: 3,
+      title: 'Team Meeting',
+      description: 'Weekly team sync to discuss project progress and blockers.',
+      priority: 'Low',
+      dueDate: 'Feb 2, 2026',
+      status: 'Completed'
+    }
+  ];
+
+  const handleViewDetails = (task: Task) => {
+    setSelectedTask(task);
+    setCurrentScreen('details');
+  };
+
+  const handleBackToList = () => {
+    setCurrentScreen('list');
+    setSelectedTask(null);
+  };
+
+  const handleAddTask = () => {
+    setCurrentScreen('add');
+  };
+
+  const handleTaskAdded = () => {
+    setCurrentScreen('list');
+  };
+
+  return (
+    <div className="size-full flex items-center justify-center bg-gray-100">
+      {/* Mobile Phone Frame */}
+      <div className="w-[375px] h-[667px] bg-white shadow-2xl overflow-hidden relative">
+        {currentScreen === 'list' && (
+          <TaskListScreen 
+            tasks={mockTasks} 
+            onViewDetails={handleViewDetails}
+            onAddTask={handleAddTask}
+          />
+        )}
+        {currentScreen === 'details' && selectedTask && (
+          <TaskDetailsScreen 
+            task={selectedTask}
+            onBack={handleBackToList}
+          />
+        )}
+        {currentScreen === 'add' && (
+          <AddTaskScreen 
+            onBack={handleBackToList}
+            onTaskAdded={handleTaskAdded}
+          />
+        )}
+        
+        {/* Screen Indicator */}
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10 pointer-events-none">
+          <div className={`w-2 h-2 rounded-full ${currentScreen === 'list' ? 'bg-gray-800' : 'bg-gray-300'}`} />
+          <div className={`w-2 h-2 rounded-full ${currentScreen === 'details' ? 'bg-gray-800' : 'bg-gray-300'}`} />
+          <div className={`w-2 h-2 rounded-full ${currentScreen === 'add' ? 'bg-gray-800' : 'bg-gray-300'}`} />
+        </div>
+      </div>
+    </div>
+  );
+}
